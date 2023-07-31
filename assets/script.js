@@ -16,3 +16,34 @@ function fetchWeatherData(city) {
         .catch(error => console.log('Error fetching data:', error));
 }
 
+function displayWeatherData(data) {
+    const city = data.city.name;
+    const currentWeather = data.list[0];
+    const forecast = data.list.slice(1, 6);
+
+    currentWeatherDiv.innerHTML = `
+    <h2>${city}</h2>
+    <p>Date: ${currentWeather.dt_txt}</p>
+    <p>Weather Icon: ${currentWeather.weather[0].icon}</p>
+    <p>Temperature: ${currentWeather.main.temp}F</p>
+    <p>Humidity: ${currentWeather.main.humidity}%</p>
+    <p>Wind Speed: ${currentWeather.wind.speed} MPH</p>
+    `;
+
+    forecastDiv.innerHTML = `
+    <h2>5-Day Forecast</h2>
+    <ul>
+        ${forecast.map(day => `
+        <li>
+            <p>Date: ${item.dt_txt}</p>
+            <p>Weather Icon: ${item.weather[0].icon}</p>
+            <p>Temperature: ${item.main.temp}F</p>
+            <p>Humidity: ${item.main.humidity}%</p>
+            <p>Wind Speed: ${item.wind.speed} MPH</p>
+        </li>
+        `).join('')}
+    </ul>
+    `;
+
+    
+}
