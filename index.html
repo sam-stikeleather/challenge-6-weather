@@ -5,22 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather</title>
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
 <body>
-    <h1>Weather Dashboard</h1>
-    <form id="searchForm">
-        <label for="cityInput">Enter City</label>
-        <input type="text" id="cityInput" required>
-        <button type="submit">Search</button>
-    </form>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Weather Dashboard</h1>
+            <form id="searchForm">
+                <div class="field has-addons">
+                    <div class="control">
+                        <input class="input" type="text" id="cityInput" placeholder="Enter City" required>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
 
-    <div id="currentWeather"></div>
-    <div id="forecast"></div>
+            <div id="currentWeather" class="mt-4"></div>
+            <div id="forecast" class="mt-4"></div>
 
-    <div id="searchHistory"></div>
-        <h3>Search History</h3>
-        <ul id="historyList"></ul>
-    </div>
+            <div id="searchHistory" class="mt-4">
+                <h3 class="subtitle">Search History</h3>
+                <div class="buttons" id="historyList"></div>
+            </div>
+        </div>
+    </section>
 
     <link rel="script" href="assets/script.js">
 </body>
