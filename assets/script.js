@@ -22,6 +22,7 @@ function fetchWeatherData(city) {
 function displayWeatherData(data) {
   const city = data.name;
   const currentWeather = data;
+  console.log(currentWeather);
 
   // Check if weather data is available before accessing properties
   const weatherIcon = currentWeather.weather && currentWeather.weather.length > 0 ? currentWeather.weather[0].icon : 'N/A';
@@ -55,6 +56,7 @@ function fetchForecastData(city) {
 
 function displayForecastData(data) {
   const forecast = data.list;
+  console.log(forecast);
 
   // Display 5-day forecast
   forecastDiv.innerHTML = `
