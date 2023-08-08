@@ -9,30 +9,56 @@ let searchHistory = [];
 
 function fetchWeatherData(city) {
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=imperial`;
-  console.log('Fetching data for: ', city);
 
   fetch(apiUrl)
-    .then((response) => response.json())
-    .then(data => displayWeatherData(data))
+    .then(response => response.json())
+    .then(data => {
+      displayWeatherData(data);
+      fetchForecastData(city); // Fetch forecast data after displaying current weather
+    })
     .catch(error => console.log('Error fetching data:', error));
 }
 
 function displayWeatherData(data) {
-  const city = data.name; // Use data.name to get the city name for current weather
+  const city = data.name;
   const currentWeather = data;
-  const forecast = data.list.slice(1, 6);
 
+  // Check if weather data is available before accessing properties
+  const weatherIcon = currentWeather.weather && currentWeather.weather.length > 0 ? currentWeather.weather[0].icon : 'N/A';
+
+  // Display current weather
   currentWeatherDiv.innerHTML = `
     <h2>${city}</h2>
     <p>Date: ${currentWeather.dt_txt}</p>
-    <p>Weather Icon: ${currentWeather.weather[0].icon}</p>
+    <p>Weather Icon: ${weatherIcon}</p>
     <p>Temperature: ${currentWeather.main.temp}F</p>
     <p>Humidity: ${currentWeather.main.humidity}%</p>
     <p>Wind Speed: ${currentWeather.wind.speed} MPH</p>
   `;
 
+  if (!searchHistory.includes(city)) {
+    searchHistory.push(city);
+    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+  }
+  displaySearchHistory();
+}
+
+
+function fetchForecastData(city) {
+  const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=imperial`;
+
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => displayForecastData(data))
+    .catch(error => console.log('Error fetching forecast data:', error));
+}
+
+function displayForecastData(data) {
+  const forecast = data.list;
+
+  // Display 5-day forecast
   forecastDiv.innerHTML = `
-    <h2>5-Day Forecast</h2>
+    <h2>5-Day-Forecast</h2> 
     <ul>
       ${forecast.map(item => `
         <li>
@@ -45,16 +71,12 @@ function displayWeatherData(data) {
       `).join('')}
     </ul>
   `;
-
-  if (!searchHistory.includes(city)) {
-    searchHistory.push(city);
-    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-  }
-  displaySearchHistory();
 }
 
 function displaySearchHistory() {
-  historyList.innerHTML = searchHistory.map(city => `<li><button onclick="searchFromHistory('${city}')">${city}</button></li>`).join('');
+  historyList.innerHTML = searchHistory.map(city => `
+    <li><button onclick="searchFromHistory('${city}')">${city}</button></li>
+  `).join('');
 }
 
 function searchFromHistory(city) {
