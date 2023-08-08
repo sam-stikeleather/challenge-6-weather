@@ -8,13 +8,16 @@ const historyList = document.querySelector('#historyList');
 let searchHistory = [];
 
 function fetchWeatherData(city) {
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=imperial`;
+  const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=imperial`;
+  const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=imperial`;
 
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => {
-      displayWeatherData(data);
-      fetchForecastData(city); // Fetch forecast data after displaying current weather
+  Promise.all([
+    fetch(weatherApiUrl).then(response => response.json()),
+    fetch(forecastApiUrl).then(response => response.json())
+  ])
+    .then(([weatherData, forecastData]) => {
+      displayWeatherData(weatherData);
+      displayForecastData(forecastData);
     })
     .catch(error => console.log('Error fetching data:', error));
 }
@@ -22,57 +25,32 @@ function fetchWeatherData(city) {
 function displayWeatherData(data) {
   const city = data.name;
   const currentWeather = data;
-  console.log(currentWeather);
-
-  // Check if weather data is available before accessing properties
-  const weatherIcon = currentWeather.weather && currentWeather.weather.length > 0 ? currentWeather.weather[0].icon : 'N/A';
 
   // Display current weather
   currentWeatherDiv.innerHTML = `
     <h2>${city}</h2>
     <p>Date: ${currentWeather.dt_txt}</p>
-    <p>Weather Icon: ${weatherIcon}</p>
+    <p>Weather Icon: ${currentWeather.weather[0].icon}</p>
     <p>Temperature: ${currentWeather.main.temp}F</p>
     <p>Humidity: ${currentWeather.main.humidity}%</p>
     <p>Wind Speed: ${currentWeather.wind.speed} MPH</p>
   `;
-
-  if (!searchHistory.includes(city)) {
-    searchHistory.push(city);
-    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-  }
-  displaySearchHistory();
-}
-
-
-function fetchForecastData(city) {
-  const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=imperial`;
-
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => displayForecastData(data))
-    .catch(error => console.log('Error fetching forecast data:', error));
 }
 
 function displayForecastData(data) {
   const forecast = data.list;
-  console.log(forecast);
+  const forecastList = document.getElementById("forecastList"); // Get the forecast list element
 
-  // Display 5-day forecast
-  forecastDiv.innerHTML = `
-    <h2>5-Day-Forecast</h2> 
-    <ul>
-      ${forecast.map(item => `
-        <li>
-          <p>Date: ${item.dt_txt}</p>
-          <p>Weather Icon: ${item.weather[0].icon}</p>
-          <p>Temperature: ${item.main.temp}F</p>
-          <p>Humidity: ${item.main.humidity}%</p>
-          <p>Wind Speed: ${item.wind.speed} MPH</p>
-        </li>
-      `).join('')}
-    </ul>
-  `;
+  // Populate the forecast list
+  forecastList.innerHTML = forecast.map(item => `
+    <li>
+      <p>Date: ${item.dt_txt}</p>
+      <p>Weather Icon: ${item.weather[0].icon}</p>
+      <p>Temperature: ${item.main.temp}F</p>
+      <p>Humidity: ${item.main.humidity}%</p>
+      <p>Wind Speed: ${item.wind.speed} MPH</p>
+    </li>
+  `).join('');
 }
 
 function displaySearchHistory() {
